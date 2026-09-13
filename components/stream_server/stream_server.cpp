@@ -48,7 +48,13 @@ void StreamServerComponent::loop() {
 
 void StreamServerComponent::dump_config() {
     ESP_LOGCONFIG(TAG, "Stream Server:");
-#if ESPHOME_VERSION_CODE >= VERSION_CODE(2025, 11, 0)
+#if defined(USE_ADDRESS_BUFFER_SIZE)
+    // ESPHome versions where network::get_use_address() was renamed to
+    // get_use_address_to() and now fills a caller-provided buffer instead
+    // of returning a value.
+    char use_address_buf[USE_ADDRESS_BUFFER_SIZE];
+    ESP_LOGCONFIG(TAG, "  Address: %s:%u", esphome::network::get_use_address_to(use_address_buf), this->port_);
+#elif ESPHOME_VERSION_CODE >= VERSION_CODE(2025, 11, 0)
     ESP_LOGCONFIG(TAG, "  Address: %s:%u", esphome::network::get_use_address(), this->port_);
 #else
     ESP_LOGCONFIG(TAG, "  Address: %s:%u", esphome::network::get_use_address().c_str(), this->port_);
